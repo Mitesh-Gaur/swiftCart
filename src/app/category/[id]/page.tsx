@@ -7,6 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProductList, PriceRangeFilter, BrandList } from "@/app/components/product";
 import Modal from "@/app/components/Modal";
 import { baseUrl } from "@/app/auth/utils";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Page({ params }: { params: { id: string } }) {
   const [products, setProducts] = useState<any[]>([]);
@@ -20,9 +21,9 @@ export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter();
   const path = usePathname();
 
-  useEffect(() => {
-    getProductsForCategory(params.id);
-  }, [params.id]);
+  // useEffect(() => {
+  //   getProductsForCategory(params.id);
+  // }, [params.id]);
 
   const getProductsForCategory = async (id: string) => {
     const response = await fetch(`${baseUrl}/api/getProductsForCategory/${parseInt(id)}`);
@@ -31,11 +32,20 @@ export default function Page({ params }: { params: { id: string } }) {
     setProducts(data?.products);
     setSearchProducts(data?.products);
     setBrands(data?.brands);
+    return data
   };
+
+  const { isPending, error, data } = useQuery({
+    queryKey: ['productsAndBrands'],
+    queryFn: () => getProductsForCategory(params.id)
+  })
+
+  if (isPending) return 'Loading...'
+
+  if (error) return 'An error has occurred: ' + error.message
 
   const onAllBrandOptionClick = () => {
     setSelectedBrand(0);
-    filterProducts(0, minPrice, maxPrice);
   };
 
   const onBrandClick = (brand: any) => {
@@ -48,11 +58,10 @@ export default function Page({ params }: { params: { id: string } }) {
   };
 
   const filterProducts = (brandId: number | undefined, minPrice: number, maxPrice: number) => {
-    let filteredProducts = products;
+    let filteredProducts = data.products;
     if (brandId && brandId !== 0) {
       filteredProducts = filteredProducts.filter((item: any) => item.brand === brandId);
     }
-    filteredProducts = filteredProducts.filter((item: any) => item.price >= minPrice && item.price <= maxPrice);
     setSearchProducts(filteredProducts);
   };
 
@@ -65,17 +74,17 @@ export default function Page({ params }: { params: { id: string } }) {
     setSelectedBrand(undefined);
     setMinPrice(0);
     setMaxPrice(100000);
-    setSearchProducts(products);
+    setSearchProducts(data.products);
 
     router.back();
   };
 
   return (
     <div className='max-w-[1260px] mx-auto'>
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 py-4">
         <button
           onClick={handleBack}
-          className="text-[#cb202d] py-2 px-4 rounded flex items-center mr-4"
+          className="text-[#cb202d] py-2 rounded flex items-center mr-4"
         >
           <ArrowLeftIcon className={clsx('w-6 text-[#cb202d] mr-2')} /> Back
         </button>
@@ -117,7 +126,7 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="mt-4">
               {activeTab === "brands" ? (
                 <BrandList
-                  brands={brands}
+                  brands={data?.brands}
                   onBrandClick={onBrandClick}
                   onAllBrandOptionClick={onAllBrandOptionClick}
                   selectedBrand={selectedBrand}

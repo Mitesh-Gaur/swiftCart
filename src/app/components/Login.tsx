@@ -1,8 +1,13 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { AuthActions } from "@/app/auth/utils";
+import { AuthActions, baseUrl } from "@/app/auth/utils";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAppDispatch } from "@/lib/hooks";
+import { setAuthToken, setUser } from "@/lib/slices/user.slice";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "../fetcher";
+import useAuth from "@/lib/custom-hooks";
 
 type FormData = {
   email: string;
@@ -18,21 +23,29 @@ const Login = () => {
   } = useForm<FormData>();
 
   const router = useRouter();
+  const dispatch = useAppDispatch()
 
   const { login, storeToken } = AuthActions();
 
-  const onSubmit = (data: FormData) => {
-    login(data.email, data.password)
-      .json((json) => {
-        storeToken(json.access, "access");
-        storeToken(json.refresh, "refresh");
+  // Use custom hook to check if user is logged in
+  useAuth();
 
-        router.push("dashboard");
-      })
-      .catch((err) => {
-        console.log("error->", err);
-        setError("root", { type: "manual", message: err?.json?.detail });
-      });
+  const onSubmit = async (data: FormData) => {
+    try {
+      const response:any = await login(data.email, data.password).json();
+      storeToken(response.access, "access");
+      storeToken(response.refresh, "refresh");
+      dispatch(setAuthToken(response.access));
+      // Revalidate user data after login and store it in Redux
+      // Fetch user data and store it in Redux
+      const userData = await fetcher('/api/auth/users/me');
+      dispatch(setUser(userData));
+      console.log("updatedUser", userData);
+      router.push("/"); // Redirect to the homepage or desired page after login
+    } catch (err:any) {
+      console.log("error->", err);
+      setError("root", { type: "manual", message: err?.json?.detail });
+    }
   };
 
   return (

@@ -3,7 +3,7 @@ import wretch, { Wretch, WretchError } from "wretch";
 import { AuthActions } from "@/app/auth/utils";
 
 // Extract necessary functions from the AuthActions utility.
-const { handleJWTRefresh, storeToken, getToken } = AuthActions();
+const { handleJWTRefresh, storeToken, getToken, removeTokens } = AuthActions();
 
 const api = () => {
   return (
@@ -26,11 +26,12 @@ const api = () => {
             .auth(`Bearer ${access}`)
             .fetch()
             .unauthorized(() => {
-              window.location.replace("/");
+              window.location.replace("/auth/login");
             })
             .json();
         } catch (err) {
-          window.location.replace("/");
+          removeTokens();
+          return null; // Return null if token refresh fails
         }
       })
   );
@@ -38,4 +39,11 @@ const api = () => {
 
 export const fetcher = (url: string): Promise<any> => {
   return api().get(url).json();
+};
+
+export const fetcherWithToken = ([url, token]: any) => {
+  return wretch(url)
+    .auth(`Bearer ${token}`)
+    .get()
+    .json();
 };

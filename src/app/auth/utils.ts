@@ -67,6 +67,23 @@ const resetPasswordConfirm = (
   );
 };
 
+// Function to update profile
+const updateProfile = (
+  token: string,
+  uid: string,
+  profileData: { [key: string]: any }
+) => {
+  return api
+    .url("/api/auth/update_profile/")
+    .auth(`Bearer ${token}`)
+    .json({
+      uid,
+      token,
+      ...profileData,
+    })
+    .put(); // Use .put() or .patch() instead of .post()
+};
+
 export const AuthActions = () => {
   return {
     login,
@@ -78,5 +95,6 @@ export const AuthActions = () => {
     getToken,
     logout,
     removeTokens,
+    updateProfile
   };
 };

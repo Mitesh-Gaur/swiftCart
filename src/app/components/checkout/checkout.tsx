@@ -1,17 +1,32 @@
 import clsx from "clsx";
-import { useEffect, useState } from "react";
-import { BellAlertIcon, TruckIcon, StarIcon } from "@heroicons/react/24/outline";
+import { BellAlertIcon, TruckIcon, StarIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 
-const Checkout = () => {
-  const user = {
-    address: "Test address"
+const Checkout = ({
+  user,
+  onAddressChangeClick
+}:any) => {
+
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back();
   };
-  
+
   return (
     <div className='max-w-[1260px] mx-auto flex pt-8'>
       <div className="w-8/12">
+        <div className="flex items-center justify-start">
+          <button
+            onClick={handleBack}
+            className="text-[#cb202d] rounded flex items-center"
+          >
+            <ArrowLeftIcon className={clsx('w-6 text-[#cb202d] mr-2')} /> Back
+          </button>
+        </div>
         {/* if user is not authenticated */}
-        <div className="w-11/12 mr-2 flex flex-wrap bg-white rounded-[0.5rem] shadow overflow-hidden">
+        { !user?.id ? (
+          <div className="w-11/12 mr-2 flex flex-wrap bg-white rounded-[0.5rem] shadow overflow-hidden">
           <div className="bg-[#cb202d] w-full p-2 px-8">
             <h1 className="text-xl title-font font-semibold text-white mb-1">Login or Signup</h1>
           </div>
@@ -19,8 +34,8 @@ const Checkout = () => {
             <div className="flex items-center justify-between">
               <form className="w-1/2 py-12 mx-8 flex flex-col items-stretch" method="POST" action="">
                 <div className="relative mb-4">
-                  <label htmlFor="username" className="leading-7 text-sm text-gray-400">Email</label>
-                  <input type="text" id="username" name="email" placeholder="Enter your email" className="w-full bg-[#f0f5ff] rounded-[0.5rem] text-base outline-none text-gray-400 placeholder:text-gray-400 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" required />
+                  <label htmlFor="email" className="leading-7 text-sm text-gray-400">Email</label>
+                  <input type="text" id="email" name="email" placeholder="Enter your email" className="w-full bg-[#f0f5ff] rounded-[0.5rem] text-base outline-none text-gray-400 placeholder:text-gray-400 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" required />
                 </div>
                 <button className="text-white bg-[#cb202d] border-0 py-2 px-8 focus:outline-none hover:bg-[#9b1823] rounded-[0.5rem] text-lg">Continue</button>
               </form>
@@ -40,7 +55,7 @@ const Checkout = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>) : null}
         {/* endif */}
 
         <div className="w-11/12 flex flex-wrap bg-white rounded-lg shadow overflow-hidden {% if not request.user.is_authenticated %} mt-4 {% endif %}">
@@ -49,8 +64,8 @@ const Checkout = () => {
           </div>
           <div className="text-gray-400 body-font w-full">
             <div className="flex items-center justify-between px-8 py-4">
-              <p className="text-[#212121] leading-8">{user.address}</p>
-              <button className="text-[#cb202d] border-0 py-2 px-8 focus:outline-none rounded-lg text-lg">Change</button>
+              <p className="text-[#212121] leading-8">{user?.address}</p>
+              <button onClick={onAddressChangeClick} className="text-[#cb202d] border-0 py-2 px-8 focus:outline-none rounded-lg text-lg">Change</button>
             </div>
           </div>
         </div>
@@ -79,6 +94,8 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+
+      
     </div>
   );
 }
