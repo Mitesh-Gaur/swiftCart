@@ -35,22 +35,23 @@ const links = [
 ];
 
 const getFileNameWOHostAddress = (avatar: string) => {
-  if(!avatar) { return `http://localhost:8002/avatar.svg`; }
+  if (!avatar) { return `http://localhost:8001/avatar.svg`; }
   const path = new URL(avatar).pathname;
-  const newUrl = `http://localhost:8002/${path}`;
+  const newUrl = `http://localhost:8001/${path}`;
   return newUrl;
 }
 
 export default function NavLinks() {
   // const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
+  const cart = useAppSelector(state => state.user.newCart || [])
 
   const router = useRouter();
   const { logout, removeTokens, getToken } = AuthActions();
 
   const accessToken = getToken("access");
 
-  const user:any = useAppSelector((state) => state?.user?.user)
+  const user: any = useAppSelector((state) => state?.user?.user)
   const updatedUser = {
     ...user,
     avatar: getFileNameWOHostAddress(user?.avatar ?? "")
@@ -65,7 +66,7 @@ export default function NavLinks() {
         dispatch(setLogout())
         router.push("/");
       })
-      .catch(() => {  
+      .catch(() => {
         removeTokens();
         router.push("/");
       });
@@ -78,52 +79,52 @@ export default function NavLinks() {
           <div>
             {!!accessToken && !!user?.username ? (
               <button
-              role="button"
-              className={clsx(
-                'group flex grow items-center justify-center shadow gap-2 !rounded-[0.5rem] p-3 text-sm font-medium md:flex-none md:justify-start md:py-2 md:px-3',
-              )}
-            >
+                role="button"
+                className={clsx(
+                  'group flex grow items-center justify-center shadow gap-2 !rounded-[0.5rem] p-3 text-sm font-medium md:flex-none md:justify-start md:py-2 md:px-3',
+                )}
+              >
                 {
-                updatedUser?.avatar ? <Image
-                  className="mx-auto w-[1.5rem] h-[1.5rem] object-contain"
-                  src={`${updatedUser?.avatar}`}
-                  alt={``}
-                  width={100}
-                  height={100}
-                /> : <UserCircleIcon className={clsx(
+                  updatedUser?.avatar ? <Image
+                    className="mx-auto w-[1.5rem] h-[1.5rem] object-contain"
+                    src={`${updatedUser?.avatar}`}
+                    alt={``}
+                    width={100}
+                    height={100}
+                  /> : <UserCircleIcon className={clsx(
+                    'w-6 text-[#cb202d] brightness-125',
+                    isHovered ? 'text-white' : 'group-hover:text-white'
+                  )} />
+                }
+
+                <p className={clsx('hidden md:block')}>{`${user.username}`}</p>
+
+                <ChevronDownIcon className={clsx('w-4 text-gray-400',
+                  isHovered ? 'rotate-180 transition-all' : 'transition-all')} />
+              </button>) :
+              <Link
+                key={'login'}
+                href={'/auth/login'}
+                className={clsx(
+                  'group flex grow items-center justify-center gap-2 !rounded-[0.5rem] p-3 text-sm font-medium md:flex-none md:justify-start md:py-2 md:px-3',
+                  isHovered ? 'bg-[#cb202d] !brightness-125' : 'hover:bg-[#cb202d]'
+                )}
+              >
+                <UserCircleIcon className={clsx(
                   'w-6 text-[#cb202d] brightness-125',
                   isHovered ? 'text-white' : 'group-hover:text-white'
                 )} />
-                }
 
-              <p className={clsx('hidden md:block')}>{`${user.username}`}</p>
+                <p className={clsx('hidden md:block',
+                  isHovered ? 'text-white' : 'group-hover:text-white')}
+                >{'Login'}
+                </p>
 
-              <ChevronDownIcon className={clsx('w-4 text-gray-400',
-                isHovered ? 'rotate-180 transition-all' : 'transition-all')} />
-            </button>) :
-            <Link
-              key={'login'}
-              href={'/auth/login'}
-              className={clsx(
-                'group flex grow items-center justify-center gap-2 !rounded-[0.5rem] p-3 text-sm font-medium md:flex-none md:justify-start md:py-2 md:px-3',
-                isHovered ? 'bg-[#cb202d] !brightness-125' : 'hover:bg-[#cb202d]'
-              )}
-            >
-              <UserCircleIcon className={clsx(
-                'w-6 text-[#cb202d] brightness-125',
-                isHovered ? 'text-white' : 'group-hover:text-white'
-              )} />
-
-              <p className={clsx('hidden md:block',
-                isHovered ? 'text-white' : 'group-hover:text-white')}
-              >{'Login'}
-              </p>
-
-              <ChevronDownIcon className={clsx(
-                'w-4',
-                isHovered ? 'text-white rotate-180 transition-all' : 'group-hover:text-white transition-all'
-              )} />
-            </Link>
+                <ChevronDownIcon className={clsx(
+                  'w-4',
+                  isHovered ? 'text-white rotate-180 transition-all' : 'group-hover:text-white transition-all'
+                )} />
+              </Link>
             }
           </div>
         </HoverCardTrigger>
@@ -149,7 +150,7 @@ export default function NavLinks() {
             </Link>
             {!!accessToken ? <button className="text-red-500 flex items-center px-5 py-2 text-sm" onClick={() => handleLogout()}>
               Logout
-            </button> : null }
+            </button> : null}
           </div>
         </HoverCardContent>
       </HoverCard>
@@ -162,11 +163,20 @@ export default function NavLinks() {
             key={link.name}
             href={link.href}
             className={clsx(
-              'flex grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium md:flex-none md:justify-start md:p-2 md:px-3',
+              'relative flex grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium md:flex-none md:justify-start md:p-2 md:px-3',
             )}
           >
             <LinkIcon className="w-6 text-[#cb202d] brightness-125" />
-            <p className="hidden md:block">{link.name}</p>
+            <div className='flex items-center'>
+              <p className="hidden md:block">{link.name}</p>
+              {(link.name === 'Cart' && cart?.length > 0) ? <span
+                className="absolute -top-0 left-6 w-4 h-4 text-xs inline-flex items-center justify-center text-white bg-[#cb202d] rounded-full"
+              >
+                {cart?.length}
+              </span>
+                : null
+              }
+            </div>
           </Link>
         );
       })}

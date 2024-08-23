@@ -44,10 +44,10 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <div className='max-w-[1260px] mx-auto'>
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 py-4">
         <button
           onClick={handleBack}
-          className="text-[#cb202d] py-2 px-4 rounded flex items-center mr-4"
+          className="text-[#cb202d] py-2 rounded flex items-center mr-4"
         >
           <ArrowLeftIcon className={clsx('w-6 text-[#cb202d] mr-2')} /> Back
         </button>

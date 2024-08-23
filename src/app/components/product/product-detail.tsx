@@ -1,3 +1,5 @@
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { CartItem, setCart, setNewCart } from '@/lib/slices/user.slice';
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -5,6 +7,23 @@ import React from 'react'
 const ProductDetail = ({
   product
 }: { product: any }) => {
+  const cart = useAppSelector(state => state.user.newCart)
+  const dispatch = useAppDispatch();
+
+  console.log("cart", cart);
+
+  const onAddToCartClick = () => {
+    const updatedCart = [...(cart || [])];
+    const productExists = updatedCart.some(item => item.id === product.id);
+  
+    if (!productExists) {
+      updatedCart.push(product);
+      dispatch(setNewCart(updatedCart));  // Dispatching the stringified cart
+    } else {
+      console.log('Product is already in the cart');
+    }
+  }
+
   return (
     <div className="lg:w-full mx-auto flex flex-wrap bg-white p-8 rounded-[0.5rem] shadow mt-4">
       <div className="max-w-[26rem] pt-8">
@@ -42,7 +61,7 @@ const ProductDetail = ({
         <p className="leading-relaxed mb-10">{product.description}</p>
         <div className="flex items-center">
           <span className="title-font font-medium text-2xl text-gray-900">₹{product.price}</span>
-          <button id="add-to-cart-button" className="flex ml-auto text-[#cb202d] border border-[#cb202d] py-2 px-4 focus:outline-none rounded">Add to cart</button>
+          <button id="add-to-cart-button" onClick={onAddToCartClick} className="flex ml-auto text-[#cb202d] border border-[#cb202d] py-2 px-4 focus:outline-none rounded">Add to cart</button>
           <Link href={'/checkout'} className="flex ml-4 text-white bg-[#cb202d] border-0 py-2 px-6 focus:outline-none hover:bg-[#9b1823] rounded">Buy Now</Link>
           <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
             <svg fill="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-5 h-5" viewBox="0 0 24 24">

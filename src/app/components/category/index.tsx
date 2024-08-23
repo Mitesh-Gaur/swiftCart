@@ -4,18 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export function Category() {
-
-  const [categories, setCategories] = useState<[]>([]);
-
-  // useEffect(() => {
-  //   getCategories();
-  // }, [])
-
   const getCategories = async () => {
     const response = await fetch(`${baseUrl}/api/getCategories/`);
     const categories = await response.json();
     console.log("categories: ", categories)
-    setCategories(categories)
     return categories
   }
 

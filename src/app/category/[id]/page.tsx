@@ -10,12 +10,13 @@ import { baseUrl } from "@/app/auth/utils";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Page({ params }: { params: { id: string } }) {
+  const maxPriceVal = 100000;
   const [products, setProducts] = useState<any[]>([]);
   const [searchProducts, setSearchProducts] = useState<any[]>([]);
   const [brands, setBrands] = useState<[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<number | undefined>();
   const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(100000);
+  const [maxPrice, setMaxPrice] = useState<number>(maxPriceVal);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("brands");
   const router = useRouter();
@@ -53,14 +54,21 @@ export default function Page({ params }: { params: { id: string } }) {
   };
 
   const handlePriceChange = (min: number, max: number) => {
+    console.log("min", min, "max", max);
     setMinPrice(min);
     setMaxPrice(max);
   };
 
-  const filterProducts = (brandId: number | undefined, minPrice: number, maxPrice: number) => {
+  const filterProducts = (brandId: number | undefined, min_price: number, max_price: number) => {
     let filteredProducts = data.products;
     if (brandId && brandId !== 0) {
-      filteredProducts = filteredProducts.filter((item: any) => item.brand === brandId);
+      if(max_price != maxPriceVal) {
+        filteredProducts = filteredProducts.filter((item: any) => item.brand === brandId && item.price <= max_price);
+      } else {
+        filteredProducts = filteredProducts.filter((item: any) => item.brand === brandId);
+      }
+    } else if(max_price != maxPriceVal) {
+      filteredProducts = filteredProducts.filter((item: any) => item.price <= max_price);
     }
     setSearchProducts(filteredProducts);
   };

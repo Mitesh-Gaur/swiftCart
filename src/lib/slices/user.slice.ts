@@ -2,16 +2,35 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 
+export interface CartItem {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  stock_quantity: number;
+  image_url: string;
+  updated: Date;
+  created: Date;
+  brand: number;
+  category: number;
+}
+
 // Define a type for the slice state
 interface UserState {
-  user: object | null,
-  token: string | null
+  user: object | null;
+  token: string | null;
+  cart: string;  // Change cart state to string
+  newCart: any[] | null;
+  orderCart: any[] | null 
 }
 
 // Define the initial state using that type
 const initialState: UserState = {
   user: null,
-  token: null
+  token: null,
+  cart: JSON.stringify([]),  // Initialize as an empty JSON string
+  newCart: null,
+  orderCart: null
 }
 
 export const counterSlice = createSlice({
@@ -26,6 +45,15 @@ export const counterSlice = createSlice({
     setAuthToken: (state, action: PayloadAction<string>) => {
       state.token = action.payload
     },
+    setCart: (state, action: PayloadAction<string>) => {
+      state.cart = action.payload  // Store the stringified cart
+    },
+    setNewCart: (state, action) => {
+      state.newCart = action.payload
+    },
+    setOrderCart: (state, action) => {
+      state.orderCart = action.payload
+    },
     setLogout: (state) => {
       state.token = null
       state.user = null
@@ -33,9 +61,5 @@ export const counterSlice = createSlice({
   },
 })
 
-export const { setUser, setAuthToken, setLogout } = counterSlice.actions
-
-// Other code such as selectors can use the imported `RootState` type
-export const getUser = (state: RootState) => state.user
-
+export const { setUser, setAuthToken, setLogout, setCart, setNewCart, setOrderCart } = counterSlice.actions
 export default counterSlice.reducer

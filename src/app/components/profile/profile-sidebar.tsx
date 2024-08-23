@@ -1,5 +1,6 @@
 import { ArrowLeftStartOnRectangleIcon, HeartIcon, ShoppingBagIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import Link from "next/link";
 
 const ProfileSidebar = ({
   user,
@@ -9,10 +10,10 @@ const ProfileSidebar = ({
 
   return (
     <div className="bg-white rounded-lg shadow mb-6">
-      <a className="flex text-gray-900 border-b-[0.1px] border-b-gray-100 p-6 py-3" href="/orders">
+      <Link className="flex text-gray-900 border-b-[0.1px] border-b-gray-100 p-6 py-3" href="/orders">
         <ShoppingBagIcon className={clsx('w-6 text-[#cb202d] brightness-125 mr-[24px]')} />
         <p className="uppercase text-gray-600"><strong>My orders</strong></p>
-      </a>
+      </Link>
 
       <div className="flex flex-col text-gray-900 border-b-[0.1px] border-b-gray-100 py-3 relative">
         <div className="flex px-6 pb-1">

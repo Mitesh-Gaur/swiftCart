@@ -2,7 +2,7 @@
 import wretch from "wretch";
 import Cookies from "js-cookie";
 
-export const baseUrl = "http://127.0.0.1:8002";
+export const baseUrl = "http://127.0.0.1:8001";
 
 // Base API setup for making HTTP requests
 const api = wretch("http://localhost:8000").accept("application/json");
